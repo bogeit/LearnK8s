@@ -164,7 +164,7 @@ metadata:
   name: nginx-ingress-controller
   labels:
     app: ingress-nginx
-roleRee:
+roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: nginx-ingress-controller
@@ -333,11 +333,11 @@ spec:
           env:
             - name: POD_NAME
               valueFrom:
-                fieldRee:
+                fieldRef:
                   fieldPath: metadata.name
             - name: POD_NAMESPACE
               valueFrom:
-                fieldRee:
+                fieldRef:
                   fieldPath: metadata.namespace
           ports:
             - name: http
