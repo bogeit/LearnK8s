@@ -7,7 +7,7 @@
 
 # 变量定义
 export release=3.0.0
-export k8s_ver=v.1.19.7  # v1.20.2, v.1.19.7, v1.18.15, v1.17.17
+export k8s_ver=v1.19.7  # v1.20.2, v1.19.7, v1.18.15, v1.17.17
 rootpasswd=$1
 netnum=$2
 nethosts=$3
