@@ -1178,7 +1178,7 @@ total 8
 
 在生产环境中，如果是自建机房，我们通常会在至少2台node节点上运行有ingress-nginx的pod，那么有必要在这两台node上面部署负载均衡软件做调度，来起到高可用的作用，这里我们用haproxy+keepalived，如果你的生产环境是在云上，假设是阿里云，那么你只需要购买一个负载均衡器SLB，将运行有ingress-nginx的pod的节点服务器加到这个SLB的后端来，然后将请求域名和这个SLB的公网IP做好解析即可，目前我们用二进制部署的K8s集群通信架构如下：
 
-![k8s网络架构](f:\update\博哥IT-bogoit.com\images\k8s网络架构.png)
+![k8s网络架构](./images/k8s网络架构.png)
 
 注意在每台node节点上有已经部署有了个精简版的nginx软件kube-lb做四层负载均衡，来转发apiserver的请求的，那么，我们只需要选取两台节点，部署keepalived软件并重新配置kube-lb，来生成VIP达到ha的效果，具体参照文档部署：
 
@@ -1192,7 +1192,7 @@ https://github.com/easzlab/kubeasz/blob/master/docs/setup/ex-lb.md
 
 如下图，Client客户端对`nginx.boge.com`进行DNS查询，DNS服务器（我们这里是配的本地hosts）返回了Ingress控制器的IP（也就是我们的VIP：10.0.1.222）。然后Client客户端向Ingress控制器发送HTTP请求，并在请求Host头中指定`nginx.boge.com`。Ingress控制器从该头部确定Client客户端是想访问哪个服务，通过与该服务并联的Endpoint对象查看具体的Pod IP，并将Client客户端的请求转发给其中一个pod。
 
-![ingress-working](f:\update\博哥IT-bogoit.com\images\ingress-working.png)
+![ingress-working](./images/ingress-working.png)
 
 生产环境正常情况下大部分是一个Ingress对应一个Service服务，但在一些特殊情况，需要复用一个Ingress来访问多个服务的，下面我们来实践下
 
