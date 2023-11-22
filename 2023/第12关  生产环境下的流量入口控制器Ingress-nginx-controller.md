@@ -38,7 +38,7 @@ Ingress Controller通过API Server获取Ingress资源的变化，动态地生成
 
 
 
-![ingress](.\images\ingress.png)
+![ingress](./images/ingress.png)
 
 
 
