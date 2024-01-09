@@ -130,7 +130,8 @@ if [[ ${software_packet} == '' ]];then
     sed -ri "s+^(K8S_BIN_VER=).*$+\1${k8s_ver}+g" ezdown
     chmod +x ./ezdown
     # ubuntu_22         to download package of Ubuntu 22.04
-    ./ezdown -D && ./ezdown -P ubuntu_22 && ./ezdown -X
+    ./ezdown -D && ./ezdown -P ubuntu_22
+    if [[ ${cni} == "cilium" ]];then ./ezdown -X cilium;fi
 else
     tar xvf ${software_packet} -C /etc/
     sed -ri "s+^(K8S_BIN_VER=).*$+\1${k8s_ver}+g" ${pwd}/ezdown
