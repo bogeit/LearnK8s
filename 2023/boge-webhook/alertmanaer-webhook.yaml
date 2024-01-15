@@ -1,0 +1,60 @@
+# curl -X POST -H 'Content-type: application/json' -d '{"name": "boge","titlea": "'"$(id)"'", "texta": "'"$(whoami)-$(hostname)"'"}' 10.68.138.60/b01bdc063/boge/getjson
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alertmanaer-dingtalk-svc
+  labels:
+    app: alertmanaer-webhook
+    model: dingtalk
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 9999
+  type: ClusterIP
+  selector:
+    app: alertmanaer-webhook
+    model: dingtalk
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: alertmanaer-webhook
+    model: dingtalk
+  name: alertmanaer-dingtalk-dp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alertmanaer-webhook
+      model: dingtalk
+  template:
+    metadata:
+      labels:
+        app: alertmanaer-webhook
+        model: dingtalk
+    spec:
+      containers:
+      - name: alertmanaer-webhook
+        image: harbor.boge.com/product/alertmanaer-webhook:1.0
+        env:
+          - name: TZ
+            value: Asia/Shanghai
+        ports:
+        - containerPort: 9999
+        args:
+          - web
+          - "https://oapi.dingtalk.com/robot/send?access_token=xxxxxxxxxxxxxxxxxxxxxxx"
+          - "9999"
+          - "serviceA,DeadMansSnitch"
+      hostAliases:
+      - hostnames:
+        - harbor.boge.com
+        ip: 10.0.1.201
+        # kubectl create secret docker-registry boge-secret --docker-server=harbor.boge.com --docker-username=boge --docker-password=Boge@666 --docker-email=admin@boge.com
+      imagePullSecrets:
+      - name: boge-secret
