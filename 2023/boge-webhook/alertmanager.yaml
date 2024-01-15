@@ -58,5 +58,5 @@ inhibit_rules:
 receivers:
 - name: 'webhook'
   webhook_configs:
-  - url: 'http://alertmanaer-dingtalk-svc.kube-system/b01bdc063/boge/getjson'
+  - url: 'http://alertmanaer-dingtalk-svc.monitoring/b01bdc063/boge/getjson'
     send_resolved: true
