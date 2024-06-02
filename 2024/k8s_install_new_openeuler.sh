@@ -30,7 +30,7 @@ if cat /etc/redhat-release &>/dev/null;then
     yum update -y
 elif cat /etc/openEuler-release &>/dev/null;then
     yum update -y
-    yum install bash-completion -y
+    yum install bash-completion sshpass tar -y
     if [ -f /usr/share/bash-completion/bash_completion ]; then
         . /usr/share/bash-completion/bash_completion
         echo "source /usr/share/bash-completion/bash_completion" >> ~/.bashrc
