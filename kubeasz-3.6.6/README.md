@@ -21,5 +21,6 @@ kube-system   calico-kube-controllers-54cdc99cb-lcjfq   2m           13Mi
 kube-system   calico-node-5rstc                         40m          121Mi
 kube-system   coredns-75dd46b86b-z22dl                  2m           14Mi
 kube-system   metrics-server-74f6d6fdd5-mv4j9           3m           18Mi
-kube-system   node-local-dns-rbtmw  
+kube-system   node-local-dns-rbtmw                      6m           10Mi
+
 ```
