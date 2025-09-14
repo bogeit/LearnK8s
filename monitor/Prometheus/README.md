@@ -5,7 +5,11 @@
 
 ![prometheus](../pics/prometheus.png)
 
+Kubernetes 和 Prometheus 都是云计算领域非常重要的开源项目，它们都源自 Google 内部大规模生产环境的实践经验。简单来说：
 
+Kubernetes 是 Google 内部容器编排系统 Borg 的开源实现。
+
+Prometheus 则是 Google 内部监控系统 BorgMon 的开源实现。
 
 
 ### 开始部署
