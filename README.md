@@ -1,5 +1,6 @@
 # 博哥的运维监控私房菜
 文档及相关文件在**monitor**目录下
+![运维报警中心架构图](./monitor/pics/运维报警中心架构图.png)
 
 # LearnK8s
 kubeasz-3.6.6/k8s_install_new.sh  支持`https://github.com/easzlab/kubeasz` 3.6.6版本的安装，**增加了国内镜像代理，能非常丝滑地安装kubernetes v1.32.3版本。**
