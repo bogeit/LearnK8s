@@ -2,6 +2,6 @@
 
 https://github.com/AliyunContainerService/kube-eventer
 
-![kube-eventer](..\pics\kube-eventer.png)
+![kube-eventer](../pics/kube-eventer.png)
 
 ### 开始部署
