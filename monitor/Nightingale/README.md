@@ -6,9 +6,6 @@ https://c9xudyniiq.feishu.cn/slides/O6xJsUzZclzeUrdMb9DcynVtnSf
 
 https://flashcat.cloud/docs/content/flashcat-monitor/nightingale-v8/prologue/introduction/
 
-#### 帮助论坛
-
-https://answer.flashcat.cloud/questions
 
 #### 下载中心
 
