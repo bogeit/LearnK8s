@@ -349,3 +349,50 @@ systemctl start categraf.service  开启agent测试恢复消息
 
 ```
 
+
+
+
+#### 启动运维监控中心 alarm-agent
+
+```shell
+# 命令行运行测试
+./nightingale -port 8889 -url "http://10.0.1.204:9999/send" -token "111" -dataSourceType "N9E夜莺测试" -region "测试环境" -ip "1.6.7.8" -webhookType "feishuv2cardSecret::222"  --webhookID 333
+
+
+
+
+
+# systemd管理二进制运行
+# vim /mnt/alarm-agent/etc/nightingale.env
+alarm_params='-port 8889 -url "http://10.0.1.204:9999/send" -token "111" -dataSourceType "N9E夜莺测试" -region "测试环境" -ip "1.6.7.8" -webhookType 'feishuv2cardSecret::222'  --webhookID 333'
+
+
+#  vim /usr/lib/systemd/system/nightingale.service
+[Unit]
+Description=The alarm nightingale service
+After=syslog.target network-online.target remote-fs.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+LimitNOFILE=65535
+WorkingDirectory=/mnt/alarm-agent
+EnvironmentFile=/mnt/alarm-agent/etc/nightingale.env
+ExecStart=/mnt/alarm-agent/bin/nightingale $alarm_params
+ExecStop=/bin/kill -s QUIT $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
+
+# systemctl start nightingale.service
+# systemctl status -l nightingale.service
+# systemctl stop nightingale.service
+
+
+```
+
+
+
+
