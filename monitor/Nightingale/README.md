@@ -1,3 +1,5 @@
+## Nightingale： 国产监控系统里的“六边形战士”，集强大与易用于一身，从云到地都能管。
+
 ### 夜莺(以下简称N9E)介绍PPT
 
 https://c9xudyniiq.feishu.cn/slides/O6xJsUzZclzeUrdMb9DcynVtnSf
