@@ -306,3 +306,46 @@ WantedBy=multi-user.target
 
 ps uax|grep categraf
 ```
+
+
+
+#### 配置N9E夜莺
+
+> http://10.0.1.201:17000/
+>
+> 默认用户是 `root`，密码是 `root.2020`
+
+```shell
+集成中心 --- 数据源, 添加 Prometheus Like
+
+*名称
+Victoria
+
+*URL
+# VictoriaMetrics单机版
+#http://10.0.1.201:8428
+# VictoriaMetrics集群版
+http://10.0.1.202:8481/select/0/prometheus/
+
+Remote Write URL
+# VictoriaMetrics单机版
+#http://10.0.1.201:8428/api/v1/write
+# VictoriaMetrics集群版
+http://10.0.1.203:8480/insert/0/prometheus/api/v1/write
+测试并保存
+
+数据查询 --- 仪表盘 --- 导入 --- 搜索 "linux" --- 选择第二项"机器常用指标..."
+
+集成中心 --- 模板中心  "这里可以看到支持哪些数据查询模板"
+
+报警如果发送自定义webhook地址，可按如下配置：
+通知 --- 通知规则 --- 新增(这里测试起名为test) --- 通知媒介选择 Callback --- Callback Url配置报警接收地址  http://10.0.1.202:8889
+
+告警 --- 规则管理 --- 导入 --- 选择 组件及分类 （注：添加备注，在报警消息内容会显示）
+可用这条告警规则测试 Lost connection with monitoring target - telegraf ，点击进来，备注添加为"机器挂了"，通知规则选择上面创建的 test ， 适当调整重复通知间隔（分钟）， 勾上立即启用，保存
+然后找台机器开始测试
+systemctl stop categraf.service   关闭agent测试报警消息
+systemctl start categraf.service  开启agent测试恢复消息
+
+```
+
