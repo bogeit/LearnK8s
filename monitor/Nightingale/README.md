@@ -58,7 +58,7 @@ docker run --name myredis \
 ```
 
 
-#### 分布式集群时序库 VictoriaMetrics
+#### VictoriaMetrics 分布式时序库集群
 
 VictoriaMetrics 是一个可水平扩容的本地化时序数据库存储方案，它的优势有：
 
