@@ -57,3 +57,140 @@ docker run --name myredis \
            redis-server --requirepass bogeit"
 ```
 
+
+#### 分布式集群时序库 VictoriaMetrics
+
+VictoriaMetrics 是一个可水平扩容的本地化时序数据库存储方案，它的优势有：
+
+* 兼容 Prometheus的API，可以直接使用其配置，通常用于Prometheus的数据存储使用
+* 指标数据查询性能很好，比InfluxDB高出20倍左右
+* 在处理大量时间序列的数据时，它的内存方便也做了很大优化，比Prometheus少约7倍
+* 数据压缩方式非常高效，与Prometheus相比，所需存储空间减少了7倍左右
+* 完善的架构设计，可完全代替Prometheus
+
+
+
+##### 部署集群数据源存储
+
+![vm-cluster](../pics/vm-cluster.png)
+
+
+
+```shell
+# 角色节点规划
+vmstorage  # 10.0.1.202  10.0.1.203  #相关端口 8482 8401 8400 
+vmselect  # 10.0.1.202  #相关端口 8481 
+vminsert  # 10.0.1.203  #相关端口 8480 
+
+#下载地址 https://github.com/VictoriaMetrics/VictoriaMetrics/releases/latest
+
+# 把vm二进制文件按每台节点的角色规则准备好
+cd /mnt
+wget https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/v1.126.0/victoria-metrics-linux-amd64-v1.126.0-cluster.tar.gz
+
+tar xf victoria-metrics-linux-amd64-v1.126.0-cluster.tar.gz && rm victoria-metrics-linux-amd64-v1.126.0-cluster.tar.gz
+
+#nohup ./vm*-prod &>vm.log &
+scp vmstorage-prod 10.0.1.202:/usr/bin/
+scp vmstorage-prod 10.0.1.203:/usr/bin/
+
+scp vmselect-prod 10.0.1.202:/usr/bin/
+scp vminsert-prod 10.0.1.203:/usr/bin/
+
+
+# vim /usr/lib/systemd/system/vmstorage.service
+
+[Unit]
+Description=High-performance, cost-effective and scalable time series database, long-term remote storage for Prometheus
+After=network.target
+
+[Service]
+Type=simple
+StartLimitBurst=5
+StartLimitInterval=0
+Restart=on-failure
+RestartSec=1
+ExecStart=/usr/bin/vmstorage-prod -storageDataPath=/var/lib/victoria-metrics-data -loggerTimezone Asia/Shanghai -httpListenAddr :8482 -vminsertAddr :8400 -vmselectAddr :8401
+ExecStop=/bin/kill -s SIGTERM $MAINPID
+LimitNOFILE=65536
+LimitNPROC=32000
+
+[Install]
+WantedBy=multi-user.target
+
+# systemctl start vmstorage.service
+# systemctl status vmstorage.service
+# systemctl enable vmstorage.service
+# systemctl is-enabled vmstorage.service
+
+
+# vim /usr/lib/systemd/system/vmselect.service
+
+[Unit]
+Description=High-performance, cost-effective and scalable time series database, long-term remote storage for Prometheus
+After=network.target
+
+[Service]
+Type=simple
+StartLimitBurst=5
+StartLimitInterval=0
+Restart=on-failure
+RestartSec=1
+ExecStart=/usr/bin/vmselect-prod -httpListenAddr :8481 -storageNode=10.0.1.202:8401,10.0.1.203:8401
+ExecStop=/bin/kill -s SIGTERM $MAINPID
+LimitNOFILE=65536
+LimitNPROC=32000
+
+[Install]
+WantedBy=multi-user.target
+
+# systemctl start vmselect.service
+# systemctl status vmselect.service
+# systemctl enable vmselect.service
+# systemctl is-enabled vmselect.service
+
+
+# vim /usr/lib/systemd/system/vminsert.service
+
+[Unit]
+Description=High-performance, cost-effective and scalable time series database, long-term remote storage for Prometheus
+After=network.target
+
+[Service]
+Type=simple
+StartLimitBurst=5
+StartLimitInterval=0
+Restart=on-failure
+RestartSec=1
+ExecStart=/usr/bin/vminsert-prod -httpListenAddr :8480 -storageNode=10.0.1.202:8400,10.0.1.203:8400
+ExecStop=/bin/kill -s SIGTERM $MAINPID
+LimitNOFILE=65536
+LimitNPROC=32000
+
+[Install]
+WantedBy=multi-user.target
+
+# systemctl start vminsert.service
+# systemctl status vminsert.service
+# systemctl enable vminsert.service
+# systemctl is-enabled vminsert.service
+
+
+
+
+
+curl http://10.0.1.202:8482/metrics  # vmstorage
+curl http://10.0.1.203:8482/metrics  # vmstorage
+curl http://10.0.1.202:8481/metrics  # vmselect
+curl http://10.0.1.203:8480/metrics  # vminsert
+
+
+
+
+iptables -I INPUT -p tcp --dport 8482 -j ACCEPT
+iptables -I INPUT -p tcp --dport 8481 -j ACCEPT
+iptables -I INPUT -p tcp --dport 8480 -j ACCEPT
+```
+
+
+
