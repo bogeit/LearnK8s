@@ -193,4 +193,70 @@ iptables -I INPUT -p tcp --dport 8480 -j ACCEPT
 ```
 
 
+#### 下载并安装N9E夜莺
+```shell
+# 下载n9e服务二进制包
+mkdir -p /mnt/n9e
+wget https://github.com/ccfos/nightingale/releases/download/v8.3.1/n9e-v8.3.1-linux-amd64.tar.gz
+tar xf n9e-v8.3.1-linux-amd64.tar.gz -C /mnt/n9e && rm -f n9e-v8.3.1-linux-amd64.tar.gz
 
+
+# 恢复数据库
+docker cp /mnt/n9e/n9e.sql mysql-test:/tmp/
+docker exec -it mysql-test bash
+  mysql -uroot -pbogeit < /tmp/n9e.sql
+
+
+# 修改配置  vim /mnt/n9e/etc/config.toml
+[DB]
+DBType = "mysql"
+DSN = "root:bogeit@tcp(10.0.1.201:3306)/n9e_v6?charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=true"
+
+
+[Redis]
+# address, ip:port or ip1:port,ip2:port for cluster and sentinel(SentinelAddrs)
+Address = "10.0.1.201:6379"
+Username = "root"
+Password = "bogeit"
+
+
+
+[[Pushgw.Writers]]
+# VictoriaMetrics集群版连接
+Url = "http://10.0.1.203:8480/insert/0/prometheus/api/v1/write"
+# VictoriaMetrics单机版连接
+#Url = "http://127.0.0.1:8428/api/v1/write"
+
+
+
+# 启动服务
+# systemctl start n9e.service
+# systemctl status n9e.service
+# systemctl enable n9e.service
+# systemctl is-enabled n9e.service
+
+
+# vim /usr/lib/systemd/system/n9e.service
+
+[Unit]
+Description=n9e core
+After=network.target
+
+[Service]
+Type=simple
+StartLimitBurst=5
+StartLimitInterval=0
+Restart=on-failure
+RestartSec=1
+ExecStart=/mnt/n9e/n9e -configs /mnt/n9e/etc/
+ExecStop=/bin/kill -s SIGTERM $MAINPID
+LimitNOFILE=65536
+LimitNPROC=32000
+
+[Install]
+WantedBy=multi-user.target
+
+
+ss -tlnp|grep 17000
+iptables -I INPUT -p tcp --dport 17000 -j ACCEPT
+```
