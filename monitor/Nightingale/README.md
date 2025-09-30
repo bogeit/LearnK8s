@@ -260,3 +260,49 @@ WantedBy=multi-user.target
 ss -tlnp|grep 17000
 iptables -I INPUT -p tcp --dport 17000 -j ACCEPT
 ```
+
+
+#### 下载并安装N9E夜莺采集端categraf
+```shell
+# 下载并准备好服务目录
+wget https://github.com/flashcatcloud/categraf/releases/download/v0.4.21/categraf-v0.4.21-linux-amd64.tar.gz
+mkdir -p /mnt/categraf
+tar xf categraf-v0.4.21-linux-amd64.tar.gz -C /mnt/categraf && rm -f categraf-v0.4.21-linux-amd64.tar.gz
+mv /mnt/categraf/categraf-v0.4.21-linux-amd64/categraf /usr/bin/
+
+# 修改配置文件
+vim /mnt/categraf/categraf-v0.4.21-linux-amd64/conf/config.toml
+
+[[writers]]
+url = "http://10.0.1.201:17000/prometheus/v1/write"
+
+
+# 启动配置
+
+# vim /usr/lib/systemd/system/categraf.service
+
+[Unit]
+Description=categraf agent
+After=network.target
+
+[Service]
+Type=simple
+StartLimitBurst=5
+StartLimitInterval=0
+Restart=on-failure
+RestartSec=1
+ExecStart=/usr/bin/categraf -configs /mnt/categraf/categraf-v0.4.21-linux-amd64/conf/
+ExecStop=/bin/kill -s SIGTERM $MAINPID
+LimitNOFILE=65536
+LimitNPROC=32000
+
+[Install]
+WantedBy=multi-user.target
+
+# systemctl start categraf.service
+# systemctl status categraf.service
+# systemctl enable categraf.service
+# systemctl is-enabled categraf.service
+
+ps uax|grep categraf
+```
