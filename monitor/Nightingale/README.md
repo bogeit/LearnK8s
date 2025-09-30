@@ -33,9 +33,26 @@ https://github.com/ccfos/nightingale
 #### docker部署mysql和redis
 
 ```shell
-docker run -d --name mysql-test -p3306:3306 -e MYSQL_ROOT_PASSWORD=bogeit -v /mnt/mysql-data:/var/lib/mysql registry.cn-beijing.aliyuncs.com/bogeit/mysql:5.7.44-oraclelinux7 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max_allowed_packet=20M --lower_case_table_names=1 --max_connections=5000 --sql_mode=STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+docker run -d --name mysql-test \
+           -p3306:3306 \
+           -e MYSQL_ROOT_PASSWORD=bogeit \
+           -v /mnt/mysql-data:/var/lib/mysql \
+           registry.cn-beijing.aliyuncs.com/bogeit/mysql:5.7.44-oraclelinux7 \
+           --character-set-server=utf8mb4 \
+           --collation-server=utf8mb4_unicode_ci \
+           --max_allowed_packet=20M \
+           --lower_case_table_names=1 \
+           --max_connections=5000 \
+           --sql_mode=STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
 
 
-docker run --name myredis --net host --privileged -d registry.cn-beijing.aliyuncs.com/bogeit/redis:6.2.16-alpine3.20 /bin/sh -c "echo 2000 > /proc/sys/net/core/somaxconn && echo 1 > /proc/sys/vm/overcommit_memory && mount -o remount rw /sys && echo never > /sys/kernel/mm/transparent_hugepage/enabled && redis-server --requirepass bogeit"
+docker run --name myredis \
+           --net host --privileged \
+           -d registry.cn-beijing.aliyuncs.com/bogeit/redis:6.2.16-alpine3.20 \
+           /bin/sh -c "echo 2000 > /proc/sys/net/core/somaxconn && \
+           echo 1 > /proc/sys/vm/overcommit_memory && \
+           mount -o remount rw /sys && \
+           echo never > /sys/kernel/mm/transparent_hugepage/enabled && \
+           redis-server --requirepass bogeit"
 ```
 
