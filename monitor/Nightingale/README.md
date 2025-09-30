@@ -31,6 +31,7 @@ https://github.com/ccfos/nightingale
 ### 全量部署夜莺N9E监控系统
 
 #### docker部署mysql和redis
+大家提前安装好docker环境，这个大家可以自行问AI解决安装问题，确保能正常使用命令docker version
 
 ```shell
 docker run -d --name mysql-test \
