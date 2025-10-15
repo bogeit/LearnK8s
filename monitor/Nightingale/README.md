@@ -396,5 +396,48 @@ WantedBy=multi-user.target
 ```
 
 
+#### 自定义监控数据上传
+
+
+```shell
+# 修改配置，启用Categraf的http配置段，把http.enable设置为true
+#  vim /mnt/categraf/categraf-v0.4.21-linux-amd64/conf/config.toml
+
+[http]
+enable = true
+address = ":9111"
+
+
+# 发送自定义监控数据
+#  /api/push/openfalcon 走的是 Open-Falcon 的传输协议
+
+metric="tcp-3306-connection"
+service_ver=test
+pod=mypod
+ts=$(date +%s)
+sql_conn_num=1
+
+curl -s -X POST -d "[{\"metric\": \"${metric}\", \"endpoint\": \"bj-conn-${service_ver}-${pod}\", \"timestamp\": $ts,\"step\": 60,\"value\": ${sql_conn_num},\"counterType\": \"GAUGE\",\"tags\": \"idc=bj,project=n9e\"}]" http://10.0.1.201:9111/api/push/openfalcon
+
+succ:1 fail:0 message:data pushed to queue
+
+
+# 上面curl如果停止上传数据，会产生报警，如果确认不再上传了，在 基础设施 --- 业务组 --- 找到相关机器删掉就行了。
+```
+
+
+
+#### 相关问题记录
+
+```shell
+# categraf运行后一直有输出一些错误日志，虽然不影响运行，但会影响我查看日志
+
+failed to get disk usage, mountpoint: /run/user/0/doc error: operation not permitted
+
+修改配置并重启服务  /mnt/categraf/categraf-v0.4.21-linux-amd64/conf/input.disk/disk.toml
+可以尝试在这里加上黑名单 ignore_mount_points = ["/boot", "/var/lib/kubelet/pods", "/run/user/0/doc"]
+如果无效，可以加白名单 mount_points = ["/", "/boot/efi"]
+```
+
 
 
